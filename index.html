@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css" integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous">
+<script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+<script type="text/javascript" src="external/require.js"></script>
+<script type="text/javascript" src="libminikuji.min.js"></script>
+<script type="text/javascript">
+var board;
+
+function reset() {
+    board = new_board();
+    $('#scratch-board td input').val("0");
+    $('#scratch-board td').removeAttr('value');
+    refreshBoardStyle();
+}
+
+function refreshBoardStyle() {
+    var elements = $('#scratch-board tr *');
+    elements.removeClass('selected');
+    elements.removeClass('duplicated');
+    elements.removeClass('expected-1');
+    elements.removeClass('expected-2');
+    elements.removeClass('expected-3');
+    elements.removeClass('expected-4');
+    elements.removeClass('expected-5');
+    elements.removeClass('expected-6');
+    elements.removeClass('expected-7');
+    elements.removeClass('expected-8');
+    $('#expected-table tbody').empty();
+}
+
+function validate(board) {
+    var duplicated = board.filter(function (x, i, self) {
+        return x > 0 && self.indexOf(x) === i && i !== self.lastIndexOf(x);
+    });
+    duplicated.forEach(function(value) {
+        $('#scratch-board td[value="' + value +'"]').addClass('duplicated');
+    });
+    return duplicated.length == 0;
+}
+
+function calcExpectedIndex(board) {
+    var expected_indexes = calc_higher_expected_index(board);
+    var keys = Object.keys(expected_indexes).sort(function(a,b) { return b - a; });
+    for (var i=0; i < keys.length; ++i) {
+        var score = keys[i];
+        var indexes = expected_indexes[score];
+        indexes.forEach(function(index) {
+            $('#scratch-board .index' + index).addClass('expected-' + (i + 1));
+        });
+    }
+}
+
+function calcExpectedLine(board) {
+    var table = $('#expected-table tbody')
+    table.empty();
+
+    Object.keys(LINES).forEach(function(line_id) {
+        var expected_scores = get_expected_scores(board, line_id);
+        var tr = $('<tr class="line' + line_id + '"></tr>');
+        tr.append('<th>' + line_id + '</th>');
+        tr.append('<td>' + expected_scores.sort(function(a,b) { return b-a; }) + '</td>');
+        tr.append('<td>' + (100.0 / expected_scores.length) + '%</td>');
+        tr.append('<td></td>');
+        tr.appendTo(table);
+    });
+    $('#expected-table table tr').click(function() {
+        $('#scratch-board .selected').removeClass('selected');
+        $('#scratch-board .' + $(this).attr('class')).addClass('selected');
+    });
+
+    var expected_lines = calc_higher_expected_line(board);
+    var keys = Object.keys(expected_lines).sort(function(a,b) { return b - a; });
+    for (var i=0; i < keys.length; ++i) {
+        var score = keys[i];
+        var lines = expected_lines[score];
+        lines.forEach(function(line_id) {
+            $('#scratch-board .line' + line_id).addClass('expected-' + (i + 1));
+            $('#expected-table .line' + line_id).addClass('expected-' + (i + 1));
+            $('#expected-table .line' + line_id + ' td:last').text(score);
+        });
+    }
+}
+
+function calculate(board) {
+    if (board.count(0) > 5) {
+        calcExpectedIndex(board);
+    } else {
+        calcExpectedLine(board);
+    }
+}
+
+function updateState(board) {
+    $('#scratch-board td input').each(function(index, element) {
+        var e = $(this);
+        var value = +e.val();
+        value = value < 0 ? 0 : value;
+        value = value > 9 ? 9 : value;
+        e.val(value);
+        board[index] = value;
+        e.parents('td').attr('value', value);
+    });
+}
+
+function onChange() {
+    refreshBoardStyle();
+    updateState(board);
+    validate(board) && calculate(board);
+}
+
+$(document).ready(function(){
+    $('#scratch-board td').append('<input type="number" min="0" max="9" />');
+    $('#scratch-board td').each(function(index, element) {
+        var index_id = index + 1;
+        var e = $(this);
+        e.addClass('index' + index_id);
+
+        Object.keys(LINES).forEach(function(line_id) {
+            if (LINES[line_id].indexOf(index_id) >= 0) {
+                e.addClass('line' + line_id);
+            }
+        });
+    });
+    $('#scratch-board td input').change(onChange);
+    reset();
+});
+</script>
+</head>
+<body>
+    <div class="container">
+        <table id="scratch-board" class="table table-bordered">
+            <tbody>
+                <tr>
+                    <th class="line1">1</th>
+                    <th class="line2">2</th>
+                    <th class="line3">3</th>
+                    <th class="line4">4</th>
+                    <th class="line5">5</th>
+                </tr>
+                <tr>
+                    <th class="line6">6</th>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <th class="line7">7</th>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <th class="line8">8</th>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+            </tbody>
+        </table>
+
+        <button class="btn btn-default" onClick="reset()">Reset</button>
+
+        <table id="expected-table" class="table table-striped">
+            <thead>
+                <th>#</th>
+                <th>候補</th>
+                <th>確率</th>
+                <th>期待値</th>
+            </thead>
+            <tbody></tbody>
+        </table>
+    </div>
+</body>
+</html>

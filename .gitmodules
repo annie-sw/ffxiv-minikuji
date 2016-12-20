@@ -1,0 +1,3 @@
+[submodule "PythonJS"]
+	path = PythonJS
+	url = https://github.com/PythonJS/PythonJS.git
