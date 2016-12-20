@@ -15,7 +15,7 @@ var board;
 
 function reset() {
     board = new_board();
-    $('#scratch-board td input').val("0");
+    $('#scratch-board td input').val("");
     $('#scratch-board td').removeAttr('value');
     refreshBoardStyle();
 }
@@ -63,16 +63,16 @@ function calcExpectedLine(board) {
 
     Object.keys(LINES).forEach(function(line_id) {
         var expected_scores = get_expected_scores(board, line_id);
-        var tr = $('<tr class="line' + line_id + '"></tr>');
-        tr.append('<th>' + line_id + '</th>');
+        var tr = $('<tr id="expection-line' + line_id + '" class="expection-result" / >');
+        tr.append('<th class="line-no">' + line_id + '</th>');
+        tr.append('<td class="expection" />');
         tr.append('<td>' + expected_scores.sort(function(a,b) { return b-a; }) + '</td>');
-        tr.append('<td>' + (100.0 / expected_scores.length) + '%</td>');
-        tr.append('<td></td>');
         tr.appendTo(table);
     });
-    $('#expected-table table tr').click(function() {
+
+    $('#expected-table .expection-result').click(function() {
         $('#scratch-board .selected').removeClass('selected');
-        $('#scratch-board .' + $(this).attr('class')).addClass('selected');
+        $('#scratch-board .line' + $(this).children('.line-no').text()).addClass('selected');
     });
 
     var expected_lines = calc_higher_expected_line(board);
@@ -81,15 +81,19 @@ function calcExpectedLine(board) {
         var score = keys[i];
         var lines = expected_lines[score];
         lines.forEach(function(line_id) {
-            $('#scratch-board .line' + line_id).addClass('expected-' + (i + 1));
-            $('#expected-table .line' + line_id).addClass('expected-' + (i + 1));
-            $('#expected-table .line' + line_id + ' td:last').text(score);
+            var exp_tbl = $('#expection-line' + line_id)
+            exp_tbl.addClass('expected-' + (i + 1));
+            exp_tbl.children('.expection').text(score);
         });
     }
 }
 
 function calculate(board) {
-    if (board.count(0) > 5) {
+    var free_indexes = board.count(0);
+    if (free_indexes == board.length) {
+        return;
+    }
+    if (free_indexes > 5) {
         calcExpectedIndex(board);
     } else {
         calcExpectedLine(board);
@@ -102,9 +106,10 @@ function updateState(board) {
         var value = +e.val();
         value = value < 0 ? 0 : value;
         value = value > 9 ? 9 : value;
-        e.val(value);
         board[index] = value;
-        e.parents('td').attr('value', value);
+        var strval = value === 0 ? "" : value;
+        e.val(strval);
+        e.parents('td').attr('value', strval);
     });
 }
 
@@ -115,8 +120,22 @@ function onChange() {
 }
 
 $(document).ready(function(){
-    $('#scratch-board td').append('<input type="number" min="0" max="9" />');
-    $('#scratch-board td').each(function(index, element) {
+    var input = $('<input type="number" class="form-control" min="0" max="9">');
+    input.focusin(function() {
+            $(this).val("");
+        })
+        .focusout(function() {
+            var e = $(this);
+            if (e.val() == "") {
+                e.val(e.parents('td').attr('value'));
+            }
+        });
+    var form = $('<div class="input-group" />');
+    form.append('<span class="input-group-addon hidden-xs">#</span>');
+    form.append(input);
+    var board_cells = $('#scratch-board td')
+    board_cells.append(form);
+    board_cells.each(function(index, element) {
         var index_id = index + 1;
         var e = $(this);
         e.addClass('index' + index_id);
@@ -131,17 +150,51 @@ $(document).ready(function(){
     reset();
 });
 </script>
+<style type="text/css">
+#scratch-board .selected {
+    color: #666666;
+    background-color: #ccffcc;
+}
+#scratch-board .duplicated {
+    background-color: #ffcccc;
+}
+#scratch-board .expected-1 {
+    background-color: #ccffff;
+}
+#scratch-board .expected-2 {
+    background-color: #ccffcc;
+}
+#expected-table .expected-1 {
+    background-color: #ccffff;
+}
+#expected-table .expected-2 {
+    background-color: #ccffcc;
+}
+
+#scratch-board th {
+    text-align: center;
+    vertical-align: middle;
+    color: #ffffff;
+    background-color: #666666;
+}
+#expected-table .line-no {
+    text-align: center;
+}
+#expected-table .expection {
+    text-align: center;
+}
+</style>
 </head>
 <body>
     <div class="container">
         <table id="scratch-board" class="table table-bordered">
             <tbody>
                 <tr>
-                    <th class="line1">1</th>
-                    <th class="line2">2</th>
-                    <th class="line3">3</th>
-                    <th class="line4">4</th>
-                    <th class="line5">5</th>
+                    <th class="line1 col-xs-1 col-sm-1">1</th>
+                    <th class="line2 col-xs-3 col-sm-3">2</th>
+                    <th class="line3 col-xs-3 col-sm-3">3</th>
+                    <th class="line4 col-xs-3 col-sm-3">4</th>
+                    <th class="line5 col-xs-1 col-sm-1">5</th>
                 </tr>
                 <tr>
                     <th class="line6">6</th>
@@ -160,18 +213,20 @@ $(document).ready(function(){
                     <td></td>
                     <td></td>
                     <td></td>
+                    <th>
+                        <!-- <div class="input-group"> -->
+                            <button class="btn btn-default" onClick="reset()">Reset</button>
+                        <!-- </div> -->
+                    </th>
                 </tr>
             </tbody>
         </table>
 
-        <button class="btn btn-default" onClick="reset()">Reset</button>
-
-        <table id="expected-table" class="table table-striped">
+        <table id="expected-table" class="table table-striped table-responsive">
             <thead>
-                <th>#</th>
-                <th>候補</th>
-                <th>確率</th>
-                <th>期待値</th>
+                <th class="col-xs-1 col-sm-1 line-no">#</th>
+                <th class="col-xs-3 col-sm-2 expection">期待値</th>
+                <th class="col-xs-9 col-sm-9">候補</th>
             </thead>
             <tbody></tbody>
         </table>

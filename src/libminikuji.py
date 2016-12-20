@@ -4,6 +4,8 @@
 
 ALL_VALUES = list(xrange(1, 10))
 
+COST = 300
+
 SCORES = {
      6: 10000,
      7:    36,
@@ -118,7 +120,8 @@ def calc_higher_expected_index(board):
 def calc_higher_expected_line(board):
     scores = {}
     for line_id in LINES.keys():
-        score = calc_expected_points_with_line(board, line_id)
+        score = calc_expected_points_with_line(board, line_id) - COST
+        score = float(int(score * 100) / 100.0)
         if not score in scores:
             scores[score] = []
         scores[score].append(line_id)
