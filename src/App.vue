@@ -61,11 +61,11 @@ export default {
         this.selectNumber =  null
         this.showNumberPanels = false
 
-        this.expectedIndexes = null
-        this.expectedLines = null
-        this.selectedLine = null
-
         if (number >= 0) {
+          this.expectedIndexes = null
+          this.expectedLines = null
+          this.selectedLine = null
+
           this.board.splice(index, 1, number)
           if (validate()) {
             this.calcExpection(getPhase())

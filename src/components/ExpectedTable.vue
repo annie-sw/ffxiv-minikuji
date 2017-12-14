@@ -35,7 +35,7 @@ export default {
         if (scores[0] == score) {
           this.$emit('selectLine', i)
           ret["expected-1_" + i] = true
-        } else if (/* scores[1] >= 1000 && */ scores[1] == score) {
+        } else if (scores[1] == score) {
           ret["expected-2_" + i] = true
         }
       }
