@@ -61,7 +61,6 @@ export default {
     text-align: center;
 }
 #expected-table {
-    margin: 10px auto;
-    max-width: 800px;
+    margin-top: 10px;
 }
 </style>

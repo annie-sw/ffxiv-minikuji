@@ -163,8 +163,6 @@ export default {
     vertical-align: middle;
 }
 #scratch-board {
-    margin: 0 auto;
-    max-width: 800px;
     /* position: relative; */
 }
 </style>
