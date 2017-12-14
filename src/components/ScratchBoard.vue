@@ -159,11 +159,11 @@ export default {
     height: 60px;
 }
 #scratch-board td {
-    height: 60px;
     text-align: center;
     vertical-align: middle;
 }
 #scratch-board {
+    margin: 0 auto;
     max-width: 800px;
     /* position: relative; */
 }

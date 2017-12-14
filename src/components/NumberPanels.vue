@@ -30,11 +30,10 @@ export default {
 }
 #number-panels ul {
 	position: relative;
-	left: 50%;
-	float: left;
-	max-width: 600px;
 	width: 100%;
 	height: 100%;
+	margin: 0 auto;
+	max-width: 600px;
 }
 #number-panels ul li{
 	position: relative;
@@ -42,7 +41,6 @@ export default {
 	margin: 1% 1% 0% 0%;
 	border: 1px solid;
 	width: 30%;
-	left: -52%;
 	float: left;
 	list-style: none;
 	text-align: center;
