@@ -38,6 +38,8 @@ export default {
     }
   },
   methods: {
+
+    // 状態初期化
     reset: function() {
       this.board = logic.newBoard()
       this.expectedIndexes = null
@@ -45,14 +47,17 @@ export default {
       this.selectedLine = null
     },
 
+    // ScratchBoard のクリックイベント
     selectIndex: function(index, validate) {
       let getPhase = () => this.board.filter(x => x > 0).length
+
+      // ４マス以上入力してたら、未入力のマスは入力出来ないよ
       if (getPhase() >= 4 && this.board[index] == 0) {
         return
       }
 
       this.showNumberPanels = true
-      this.selectNumber = (number) => {
+      this.selectNumber = (number) => {  // NumberPanels のクリックイベント
         this.selectNumber =  null
         this.showNumberPanels = false
 
@@ -69,6 +74,7 @@ export default {
       }
     },
 
+    // ExpectedTable のクリックイベント
     selectLine: function(lineId) {
       this.selectedLine = {
         id: lineId,
@@ -76,10 +82,14 @@ export default {
       }
     },
 
+    // 候補の選出
     calcExpection: function(phase) {
       if (phase < 4) {
+        // パネル単位でスコアリング
         this.expectedIndexes = logic.calcHigherExpectedIndex(this.board)
-      } else {
+      }
+      else {
+        // 列単位でスコアリング
         let ret = {}
         for (let line_id in logic.consts.lines) {
           let values = logic.getExpectedScores(this.board, line_id).sort((a,b) => b-a);
@@ -92,6 +102,8 @@ export default {
       }
     },
   },
+
+  // 初期化
   mounted: function() {
     this.reset()
   }

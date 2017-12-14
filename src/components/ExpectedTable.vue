@@ -23,6 +23,7 @@ export default {
   props: ["expectedLines"],
   computed: {
     classObject: function() {
+      // 重複排除した降順のスコアリストを作成
       let scores = Object.values(this.expectedLines)
         .map(x => x.score)
         .filter((x, i, self) => self.indexOf(x) === i)

@@ -60,16 +60,20 @@ export default {
   },
 
   methods: {
+
+    // 表示する値を返す
     dispNumber: function(index) {
         var num = this.board[index]
         return num ? num : ''
     },
 
+    // 初期化
     reset: function() {
       this.duplicatedIndexes = []
       this.$emit('reset')
     },
 
+    // 重複チェック
     validate: function() {
       let indexes = []
       let values = this.board.filter((x, i, self) => {
@@ -86,13 +90,16 @@ export default {
       return indexes.length == 0
     },
 
+    // クリックイベント
     selectIndex: function(index) {
+      // 重複値がある場合、他の場所は入力出来ないよ
       if (this.duplicatedIndexes.length > 0 && this.duplicatedIndexes.indexOf(index) < 0) {
         return
       }
-      this.$emit('selectIndex', index, this.validate)
+      this.$emit('selectIndex', index, this.validate)  // 親へイベント通知
     },
 
+    // 重複 classObject
     getDuplicatedIndexClass: function(duplicatedIndexes) {
       let ret = {}
       for (let i of duplicatedIndexes) {
@@ -101,6 +108,7 @@ export default {
       return ret;
     },
 
+    // 期待するインデックスの classObject
     getExpectedIndexClass: function(expectedIndexes) {
       let score = Math.max.apply(null, Object.keys(expectedIndexes))
       let indexes = expectedIndexes[score]
@@ -111,6 +119,7 @@ export default {
       return ret;
     },
 
+    // 選択された列の classObject
     getSelectedLineClass: function(selectedLine) {
       let ret = {}
       let indexes = selectedLine['indexes']
