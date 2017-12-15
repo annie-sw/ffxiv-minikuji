@@ -1,7 +1,8 @@
 <template>
 	<div id="number-panels" v-on:click.stop.self="selectNumber(-1)">
+		<h2>Choose Number</h2>
 		<ul v-on:click.stop.self="selectNumber(-1)">
-			<li v-for="i in 9" v-on:click="selectNumber(i)">
+			<li v-for="i in 9" v-on:click="selectNumber(i)" v-bind:class="{ invisible: board.indexOf(i) >= 0 }">
 				<span>{{ i }}</span>
 			</li>
 			<li v-on:click="selectNumber(0)">
@@ -14,7 +15,7 @@
 <script>
 export default {
   name: "number-panels",
-  props: ["selectNumber"],
+  props: ["board", "selectNumber"],
 }
 </script>
 
@@ -27,6 +28,7 @@ export default {
 	width: 100%;
 	height: 100%;
 	background-color: rgba(150, 150, 150, 0.8);
+	text-align: center;
 }
 #number-panels ul {
 	position: relative;
@@ -48,5 +50,8 @@ export default {
 }
 #number-panels ul li:last-child {
 	width: 92%;
+}
+#number-panels .invisible {
+	visibility: hidden;
 }
 </style>

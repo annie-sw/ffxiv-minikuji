@@ -1,6 +1,6 @@
 <template>
   <div id="app">
-    <Header />
+    <AppHeader />
 
     <ScratchBoard v-bind:board="board"
                   v-bind:expectedIndexes="expectedIndexes"
@@ -13,9 +13,10 @@
                    v-on:selectLine="selectLine" />
 
     <NumberPanels v-if="showNumberPanels"
+                  v-bind:board="board"
                   v-bind:selectNumber="selectNumber" />
 
-    <Footer />
+    <AppFooter />
   </div>
 </template>
 
@@ -25,14 +26,14 @@ import ScratchBoard from './components/ScratchBoard'
 import ExpectedTable from './components/ExpectedTable'
 import NumberPanels from './components/NumberPanels'
 
-import Header from './components/Header'
-import Footer from './components/Footer'
+import AppHeader from './components/AppHeader'
+import AppFooter from './components/AppFooter'
 
 export default {
   name: 'app',
   components: {
-    Header,
-    Footer,
+    AppHeader,
+    AppFooter,
     ScratchBoard,
     ExpectedTable,
     NumberPanels,
