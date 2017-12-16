@@ -97,19 +97,11 @@ export default {
     calcExpection: function(phase) {
       if (phase < 4) {
         // パネル単位でスコアリング
-        this.expectedIndexes = logic.calcHigherExpectedIndex(this.board)
+        this.expectedIndexes = logic.getScoresPerIndex(this.board)
       }
       else {
         // 列単位でスコアリング
-        let ret = {}
-        for (let line_id in logic.consts.lines) {
-          let values = logic.getExpectedScores(this.board, line_id).sort((a,b) => b-a);
-          ret[line_id] = {
-            score: logic.sum(values) * 100 / values.length / 100,
-            values: values,
-          }
-        }
-        this.expectedLines = ret
+        this.expectedLines = logic.getScoresPerLine(this.board)
       }
     },
   },

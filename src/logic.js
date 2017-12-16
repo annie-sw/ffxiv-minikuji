@@ -40,6 +40,7 @@ const LINES = {
 }
 
 const sum = (arr) => arr.reduce(function(prev, current, i, arr) { return prev + current }, 0)
+const avg = (arr) => sum(arr) * 1.0 / arr.length
 
 
 export default {
@@ -48,13 +49,11 @@ export default {
      lines: LINES
   },
 
-  sum: sum,
-
   // 0で埋めた9要素の配列を返す
   newBoard: function() {
-    let board = []
-    for (let i=0; i < ALL_VALUES.length; ++i) {
-      board.push(0);
+    let board = Array(ALL_VALUES.length)
+    for (let i=0; i < board.length; ++i) {
+      board[i] = 0
     }
     return board
   },
@@ -94,7 +93,7 @@ export default {
   // ラインの値リストを返す
   getLineValues: function(board, line_id) {
     let values = []
-    for (let i of this.consts.lines[line_id]) {
+    for (let i of LINES[line_id]) {
       if (board[i] != 0) {
         values.push(board[i])
       }
@@ -127,49 +126,44 @@ export default {
     let ret = []
     let fixed_values = this.getLineValues(board, line_id)
     for (let expected_values of this.getPossibleValues(board, fixed_values)) {
-      ret.push(this.consts.scores[sum(expected_values)])
+      ret.push(SCORES[sum(expected_values)])
     }
     return ret
   },
 
-  // line_id の期待値を返す
-  calcExpectedPointsWithLine: function(board, line_id) {
-    let expected_scores = this.getExpectedScores(board, line_id)
-    return sum(expected_scores) * 1.0 / expected_scores.length
-  },
-
-  // 期待値をキーにインデックスのリストを返す
-  calcHigherExpectedIndex: function(board) {
+  // インデックス毎の期待値を取得
+  getScoresPerIndex: function(board) {
     let free_indexes = this.getFreeIndexes(board)
 
-    let scores = {}
+    let ret = []
     for (let index of free_indexes) {
+      // インデックスが含まれる列の期待値を取得
       let expected_scores_per_line = []
-      for (let i in this.consts.lines) {
-        if (this.consts.lines[i].indexOf(index) >= 0) {
-          expected_scores_per_line.push(this.calcExpectedPointsWithLine(board, i))
+      for (let i in LINES) {
+        if (LINES[i].indexOf(index) >= 0) {
+          let values = this.getExpectedScores(board, i)
+          expected_scores_per_line.push(avg(values))
         }
       }
-      let score = sum(expected_scores_per_line)
-      if (!(score in scores)) {
-          scores[score] = []
-      }
-      scores[score].push(index)
+      ret.push({
+        index: index,
+        score: sum(expected_scores_per_line),
+      })
     }
-    return scores
+    return ret
   },
 
-  // 期待値をキーに列のIDを返す
-  calcHigherExpectedLine: function(board) {
-    let scores = {}
-    for (let line_id in this.consts.lines) {
-        let score = this.calcExpectedPointsWithLine(board, line_id)
-        score = parseInt(score * 100) / 100.0
-        if (!(score in scores)) {
-            scores[score] = []
-        }
-        scores[score].push(line_id)
+  // 列毎の期待値を取得
+  getScoresPerLine: function(board) {
+    let ret = []
+    for (let line_id in LINES) {
+      let values = this.getExpectedScores(board, line_id).sort((a,b) => b-a);
+      ret.push({
+        id: line_id,
+        score: avg(values),
+        values: values,
+      })
     }
-    return scores
+    return ret
   }
 }

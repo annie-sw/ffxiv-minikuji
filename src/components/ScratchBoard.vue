@@ -110,12 +110,12 @@ export default {
 
     // 期待するインデックスの classObject
     getExpectedIndexClass: function(expectedIndexes) {
-      let score = Math.max.apply(null, Object.keys(expectedIndexes))
-      let indexes = expectedIndexes[score]
+      let score = Math.max(...expectedIndexes.map(x => x.score))
       let ret = {}
-      indexes.forEach(function(i) {
-        ret["expected_" + i] = true
-      })
+      for (let x of expectedIndexes) {
+        if (x.score == score)
+          ret["expected_" + x.index] = true
+      }
       return ret;
     },
 
