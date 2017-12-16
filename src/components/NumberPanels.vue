@@ -1,11 +1,14 @@
 <template>
 	<div id="number-panels" v-on:click.stop.self="selectNumber(-1)">
-		<h2>Choose Number</h2>
+		<h1><span class="label label-default">Choose Number</span></h1>
 		<ul v-on:click.stop.self="selectNumber(-1)">
-			<li v-for="i in 9" v-on:click="selectNumber(i)" v-bind:class="{ invisible: board.indexOf(i) >= 0 }">
+			<li v-for="i in 9"
+					v-on:click="selectNumber(i)"
+					v-bind:class="[{ invisible: board.indexOf(i) >= 0 }, 'panel panel-default']">
+
 				<span>{{ i }}</span>
 			</li>
-			<li v-on:click="selectNumber(0)">
+			<li v-on:click="selectNumber(0)" class="panel panel-default">
 				<span>clear</span>
 			</li>
 		</ul>
@@ -41,7 +44,7 @@ export default {
 	position: relative;
 	padding: 10% 10% 10% 10%;
 	margin: 1% 1% 0% 0%;
-	border: 1px solid;
+	/* border: 1px solid; */
 	width: 30%;
 	float: left;
 	list-style: none;

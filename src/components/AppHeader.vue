@@ -1,5 +1,5 @@
 <template>
-	<header>
+	<header class="page-header">
 		<h1>FFXIV ミニくじシミュレーター</h1>
 	</header>
 </template>

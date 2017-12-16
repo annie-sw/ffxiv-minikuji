@@ -9,6 +9,7 @@
           <tr v-for="x in expectedLines"
               v-bind:class="{ 'expected-1': classObject['expected-1_' + x.id], 'expected-2': classObject['expected-2_' + x.id] }"
               v-on:click="$emit('selectLine', x.id)">
+
             <th class="line-no">{{ x.id }}</th>
             <td class="expection">{{ x.score.toFixed(2) }}</td>
             <td>{{ x.values }}</td>

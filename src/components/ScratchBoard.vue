@@ -1,19 +1,22 @@
 <template>
-  <div>
+  <div class="panel panel-default">
     <table id="scratch-board" class="table table-bordered">
         <tbody>
             <tr>
-                <th v-bind:class="[{ expected: classObject.expected_line_1 }, 'col-xs-1', 'col-sm-1']">1</th>
-                <th v-bind:class="[{ expected: classObject.expected_line_2 }, 'col-xs-3', 'col-sm-3']">2</th>
-                <th v-bind:class="[{ expected: classObject.expected_line_3 }, 'col-xs-3', 'col-sm-3']">3</th>
-                <th v-bind:class="[{ expected: classObject.expected_line_4 }, 'col-xs-3', 'col-sm-3']">4</th>
-                <th v-bind:class="[{ expected: classObject.expected_line_5 }, 'col-xs-1', 'col-sm-1']">5</th>
+                <th v-bind:class="[{ expected: classObject.expected_line_1 }, 'col-xs-1 col-sm-1']">1</th>
+                <th v-bind:class="[{ expected: classObject.expected_line_2 }, 'col-xs-3 col-sm-3']">2</th>
+                <th v-bind:class="[{ expected: classObject.expected_line_3 }, 'col-xs-3 col-sm-3']">3</th>
+                <th v-bind:class="[{ expected: classObject.expected_line_4 }, 'col-xs-3 col-sm-3']">4</th>
+                <th v-bind:class="[{ expected: classObject.expected_line_5 }, 'col-xs-1 col-sm-1']">5</th>
             </tr>
         <tr>
             <th v-bind:class="{ expected: classObject.expected_line_6 }">6</th>
             <td v-bind:class="{duplicated: classObject.duplicated_0, expected: classObject.expected_0}" v-on:click="selectIndex(0)">{{ dispNumber(0) }}</td>
             <td v-bind:class="{duplicated: classObject.duplicated_1, expected: classObject.expected_1}" v-on:click="selectIndex(1)">{{ dispNumber(1) }}</td>
             <td v-bind:class="{duplicated: classObject.duplicated_2, expected: classObject.expected_2}" v-on:click="selectIndex(2)">{{ dispNumber(2) }}</td>
+            <td rowspan="3" class="etc">
+                <button class="btn btn-default" v-on:click="reset">Reset</button>
+            </td>
         </tr>
         <tr>
             <th v-bind:class="{ expected: classObject.expected_line_7 }">7</th>
@@ -26,9 +29,6 @@
             <td v-bind:class="{duplicated: classObject.duplicated_6, expected: classObject.expected_6}" v-on:click="selectIndex(6)">{{ dispNumber(6) }}</td>
             <td v-bind:class="{duplicated: classObject.duplicated_7, expected: classObject.expected_7}" v-on:click="selectIndex(7)">{{ dispNumber(7) }}</td>
             <td v-bind:class="{duplicated: classObject.duplicated_8, expected: classObject.expected_8}" v-on:click="selectIndex(8)">{{ dispNumber(8) }}</td>
-            <th>
-                <button class="btn btn-default" v-on:click="reset">Reset</button>
-            </th>
         </tr>
         </tbody>
     </table>
@@ -161,6 +161,10 @@ export default {
 #scratch-board td {
     text-align: center;
     vertical-align: middle;
+}
+#scratch-board td.etc {
+    text-align: center;
+    vertical-align: bottom;
 }
 #scratch-board {
     /* position: relative; */
