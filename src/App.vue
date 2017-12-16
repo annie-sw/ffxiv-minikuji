@@ -51,7 +51,7 @@ export default {
   methods: {
 
     // 状態初期化
-    reset: function() {
+    reset() {
       this.board = logic.newBoard()
       this.expectedIndexes = null
       this.expectedLines = null
@@ -59,7 +59,7 @@ export default {
     },
 
     // ScratchBoard のクリックイベント
-    selectIndex: function(index, validate) {
+    selectIndex(index, validate) {
       let getPhase = () => this.board.filter(x => x > 0).length
 
       // ４マス以上入力してたら、未入力のマスは入力出来ないよ
@@ -86,7 +86,7 @@ export default {
     },
 
     // ExpectedTable のクリックイベント
-    selectLine: function(lineId) {
+    selectLine(lineId) {
       this.selectedLine = {
         id: lineId,
         indexes: logic.consts.lines[lineId],
@@ -94,7 +94,7 @@ export default {
     },
 
     // 候補の選出
-    calcExpection: function(phase) {
+    calcExpection(phase) {
       if (phase < 4) {
         // パネル単位でスコアリング
         this.expectedIndexes = logic.getScoresPerIndex(this.board)
@@ -107,7 +107,7 @@ export default {
   },
 
   // 初期化
-  mounted: function() {
+  mounted() {
     this.reset()
   }
 }

@@ -3,32 +3,32 @@
     <table id="scratch-board" class="table table-bordered">
         <tbody>
             <tr>
-                <th v-bind:class="[{ expected: classObject.expected_line_1 }, 'col-xs-1 col-sm-1']">1</th>
-                <th v-bind:class="[{ expected: classObject.expected_line_2 }, 'col-xs-3 col-sm-3']">2</th>
-                <th v-bind:class="[{ expected: classObject.expected_line_3 }, 'col-xs-3 col-sm-3']">3</th>
-                <th v-bind:class="[{ expected: classObject.expected_line_4 }, 'col-xs-3 col-sm-3']">4</th>
-                <th v-bind:class="[{ expected: classObject.expected_line_5 }, 'col-xs-1 col-sm-1']">5</th>
+                <th v-bind:class="[{ expected: isExpectedLine(1) }, 'col-xs-1 col-sm-1']">1</th>
+                <th v-bind:class="[{ expected: isExpectedLine(2) }, 'col-xs-3 col-sm-3']">2</th>
+                <th v-bind:class="[{ expected: isExpectedLine(3) }, 'col-xs-3 col-sm-3']">3</th>
+                <th v-bind:class="[{ expected: isExpectedLine(4) }, 'col-xs-3 col-sm-3']">4</th>
+                <th v-bind:class="[{ expected: isExpectedLine(5) }, 'col-xs-1 col-sm-1']">5</th>
             </tr>
         <tr>
-            <th v-bind:class="{ expected: classObject.expected_line_6 }">6</th>
-            <td v-bind:class="{duplicated: classObject.duplicated_0, expected: classObject.expected_0}" v-on:click="selectIndex(0)">{{ dispNumber(0) }}</td>
-            <td v-bind:class="{duplicated: classObject.duplicated_1, expected: classObject.expected_1}" v-on:click="selectIndex(1)">{{ dispNumber(1) }}</td>
-            <td v-bind:class="{duplicated: classObject.duplicated_2, expected: classObject.expected_2}" v-on:click="selectIndex(2)">{{ dispNumber(2) }}</td>
+            <th v-bind:class="{ expected: isExpectedLine(6) }">6</th>
+            <td v-for="i in range(0, 2)"
+                v-bind:class="{duplicated: isDuplicated(i), expected: isExpected(i)}"
+                v-on:click="selectIndex(i)">{{ dispNumber(i) }}</td>
             <td rowspan="3" class="etc">
                 <button class="btn btn-default" v-on:click="reset">Reset</button>
             </td>
         </tr>
         <tr>
-            <th v-bind:class="{ expected: classObject.expected_line_7 }">7</th>
-            <td v-bind:class="{duplicated: classObject.duplicated_3, expected: classObject.expected_3}" v-on:click="selectIndex(3)">{{ dispNumber(3) }}</td>
-            <td v-bind:class="{duplicated: classObject.duplicated_4, expected: classObject.expected_4}" v-on:click="selectIndex(4)">{{ dispNumber(4) }}</td>
-            <td v-bind:class="{duplicated: classObject.duplicated_5, expected: classObject.expected_5}" v-on:click="selectIndex(5)">{{ dispNumber(5) }}</td>
+            <th v-bind:class="{ expected: isExpectedLine(7) }">7</th>
+            <td v-for="i in range(3, 5)"
+                v-bind:class="{duplicated: isDuplicated(i), expected: isExpected(i)}"
+                v-on:click="selectIndex(i)">{{ dispNumber(i) }}</td>
         </tr>
         <tr>
-            <th v-bind:class="{ expected: classObject.expected_line_8 }">8</th>
-            <td v-bind:class="{duplicated: classObject.duplicated_6, expected: classObject.expected_6}" v-on:click="selectIndex(6)">{{ dispNumber(6) }}</td>
-            <td v-bind:class="{duplicated: classObject.duplicated_7, expected: classObject.expected_7}" v-on:click="selectIndex(7)">{{ dispNumber(7) }}</td>
-            <td v-bind:class="{duplicated: classObject.duplicated_8, expected: classObject.expected_8}" v-on:click="selectIndex(8)">{{ dispNumber(8) }}</td>
+            <th v-bind:class="{ expected: isExpectedLine(8) }">8</th>
+            <td v-for="i in range(6, 8)"
+                v-bind:class="{duplicated: isDuplicated(i), expected: isExpected(i)}"
+                v-on:click="selectIndex(i)">{{ dispNumber(i) }}</td>
         </tr>
         </tbody>
     </table>
@@ -38,43 +38,50 @@
 <script>
 export default {
   name: 'scratch-board',
-  data: function() {
+  data() {
     return {
       duplicatedIndexes: [],
     }
   },
   props: ['board', 'expectedIndexes', 'selectedLine'],
   computed: {
-    classObject: function() {
-      if (this.duplicatedIndexes.length > 0) {
-        return this.getDuplicatedIndexClass(this.duplicatedIndexes)
+    highScoreIndexes() {
+      if (this.expectedIndexes == null)
+        return null
+
+      let score = Math.max(...this.expectedIndexes.map(x => x.score))
+      let indexes = []
+      for (let x of this.expectedIndexes) {
+        if (x.score == score)
+          indexes.push(x.index)
       }
-      if (this.expectedIndexes) {
-        return this.getExpectedIndexClass(this.expectedIndexes)
-      }
-      if (this.selectedLine) {
-        return this.getSelectedLineClass(this.selectedLine)
-      }
-      return {}
+      return indexes
     },
   },
 
   methods: {
+    range(start, end) {
+      let ret = Array(end - start + 1)
+      for (let i = 0; i < ret.length; ++i) {
+        ret[i] = start + i
+      }
+      return ret
+    },
 
     // 表示する値を返す
-    dispNumber: function(index) {
+    dispNumber(index) {
         var num = this.board[index]
         return num ? num : ''
     },
 
     // 初期化
-    reset: function() {
+    reset() {
       this.duplicatedIndexes = []
       this.$emit('reset')
     },
 
     // 重複チェック
-    validate: function() {
+    validate() {
       let indexes = []
       let values = this.board.filter((x, i, self) => {
           return x > 0 && self.indexOf(x) === i && i !== self.lastIndexOf(x)
@@ -91,7 +98,7 @@ export default {
     },
 
     // クリックイベント
-    selectIndex: function(index) {
+    selectIndex(index) {
       // 重複値がある場合、他の場所は入力出来ないよ
       if (this.duplicatedIndexes.length > 0 && this.duplicatedIndexes.indexOf(index) < 0) {
         return
@@ -100,35 +107,24 @@ export default {
     },
 
     // 重複 classObject
-    getDuplicatedIndexClass: function(duplicatedIndexes) {
-      let ret = {}
-      for (let i of duplicatedIndexes) {
-        ret["duplicated_" + i] = true
-      }
-      return ret;
+    isDuplicated(index) {
+      return this.duplicatedIndexes && this.duplicatedIndexes.indexOf(index) >= 0
     },
 
     // 期待するインデックスの classObject
-    getExpectedIndexClass: function(expectedIndexes) {
-      let score = Math.max(...expectedIndexes.map(x => x.score))
-      let ret = {}
-      for (let x of expectedIndexes) {
-        if (x.score == score)
-          ret["expected_" + x.index] = true
+    isExpected(index) {
+      if (this.highScoreIndexes) {
+        return this.highScoreIndexes.indexOf(index) >= 0
       }
-      return ret;
+      if (this.selectedLine) {
+        return this.selectedLine['indexes'].indexOf(index) >= 0
+      }
+      return false
     },
 
     // 選択された列の classObject
-    getSelectedLineClass: function(selectedLine) {
-      let ret = {}
-      let indexes = selectedLine['indexes']
-
-      ret['expected_line_' + selectedLine['id']] = true
-      indexes.forEach(function(i) {
-        ret["expected_" + i] = true
-      })
-      return ret;
+    isExpectedLine(id) {
+      return this.selectedLine && this.selectedLine['id'] == id
     },
   },
 }

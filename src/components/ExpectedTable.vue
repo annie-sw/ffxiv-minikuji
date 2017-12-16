@@ -7,7 +7,7 @@
         </thead>
         <tbody>
           <tr v-for="x in expectedLines"
-              v-bind:class="{ 'expected-1': classObject['expected-1_' + x.id], 'expected-2': classObject['expected-2_' + x.id] }"
+              v-bind:class="{ 'expected-1': isExpected(x, 0), 'expected-2': isExpected(x, 1) }"
               v-on:click="$emit('selectLine', x.id)">
 
             <th class="line-no">{{ x.id }}</th>
@@ -23,26 +23,15 @@ export default {
   name: "expected-table",
   props: ["expectedLines"],
   computed: {
-    classObject: function() {
+    scores() {
       // 重複排除した降順のスコアリストを作成
-      let scores = this.expectedLines.map(x => x.score)
+      return this.expectedLines.map(x => x.score)
         .filter((x, i, self) => self.indexOf(x) === i)
         .sort((a, b) => b - a)
-
-      let ret = {}
-      for (let x of this.expectedLines) {
-        if (scores[0] == x.score) {
-          this.$emit('selectLine', x.id)
-          ret["expected-1_" + x.id] = true
-        } else if (scores[1] == x.score) {
-          ret["expected-2_" + x.id] = true
-        }
-      }
-      return ret
-    }
+    },
   },
   methods: {
-    sort: function(mode) {
+    sort(mode) {
       if (mode === "id") {
         this.expectedLines.sort((a, b) => a.id - b.id)
       }
@@ -53,7 +42,16 @@ export default {
         this.expectedLines.sort((a, b) => b.values[0] - a.values[0] || b.score - a.score)
       }
     },
-  }
+    isExpected(scoreValue, scoreIdx) {
+      if (this.scores[scoreIdx] == scoreValue.score) {
+        if (scoreIdx == 0) {
+          this.$emit('selectLine', scoreValue.id)  // ここでイベント発行するの微妙
+        }
+        return true
+      }
+      return false
+    },
+  },
 }
 </script>
 
